@@ -4,12 +4,15 @@ import Person from './components/Person'
 import ShowPersons from './components/ShowPersons'
 import PersonFilter from './components/PersonFilter'
 import personService from './services/persons'
+import Notification from './components/Notification'
 
 const App = () => {
   const [ persons, setPersons] = useState([]) 
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ filterValue, setFilterValue ] = useState('')
+  const [ message, setMessage ] = useState(null)
+  const [ successOrFailure, setSuccessOrFailure ] = useState(null)
 
   useEffect(() => {
     personService
@@ -20,6 +23,15 @@ const App = () => {
   const resetNameAndNumberFields = () => {
     setNewName('')
     setNewNumber('')
+  }
+
+  const setSuccessOrErrorMessage = (msg, success) => {
+    success ? setSuccessOrFailure(true) : setSuccessOrFailure(false)
+
+    setMessage(msg)
+    setTimeout(() => {
+      setMessage(null)
+    }, 3000)
   }
 
   const handleNameChange = (e) => {
@@ -40,8 +52,13 @@ const App = () => {
     personService
       .deletePerson(id)
       .then(res => {
-        setPersons([...persons].filter(x => x.id !== id))
+        setSuccessOrErrorMessage(`Removed ${ name } from phonebook`, true)
       })
+      .catch(res => {
+        setSuccessOrErrorMessage(`Information of ${ name } has already been removed from server`)
+      })
+
+      setPersons([...persons].filter(x => x.id !== id))
   }
 
   const showNames = persons
@@ -58,6 +75,7 @@ const App = () => {
         return
       }
 
+      setSuccessOrErrorMessage(`Updated number for ${ newName }`, true)
       updatePerson()
       resetNameAndNumberFields()
       return
@@ -68,6 +86,7 @@ const App = () => {
       .then(res => {
         newPerson.id = res.id
         setPersons(persons.concat(newPerson))
+        setSuccessOrErrorMessage(`Added ${res.name} to phonebook`, true)
       })
 
     resetNameAndNumberFields()
@@ -87,6 +106,7 @@ const App = () => {
   
   return (
     <div>
+      <Notification message={ message } success={ successOrFailure } />
       <h2>Phonebook</h2>
       <PersonFilter filterValue={ filterValue } handleFilterChange={ handleFilterChange } />
       <h2>add a new</h2>
