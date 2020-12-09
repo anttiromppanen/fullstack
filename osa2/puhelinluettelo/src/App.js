@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import AddNewPerson from './components/AddNewPerson'
 import Person from './components/Person'
 import ShowPersons from './components/ShowPersons'
 import PersonFilter from './components/PersonFilter'
+import personService from './services/persons'
 
 const App = () => {
   const [ persons, setPersons] = useState([]) 
@@ -12,15 +12,16 @@ const App = () => {
   const [ filterValue, setFilterValue ] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(res => setPersons(res.data))
+    personService
+      .getAll()
+      .then(res => setPersons(res))
   }, [])
 
-  const showNames = persons
-    .filter(person => person.name.toLowerCase().includes(filterValue.toLowerCase()))
-    .map(person => <Person key={ person.name } name={ person.name } number={ person.number } />)
- 
+  const resetNameAndNumberFields = () => {
+    setNewName('')
+    setNewNumber('')
+  }
+
   const handleNameChange = (e) => {
     setNewName(e.target.value)
   }
@@ -33,18 +34,53 @@ const App = () => {
     setFilterValue(e.target.value)
   }
 
+  const handlePersonDelete = (id, name) => {
+    if (!window.confirm(`Delete ${ name }?`)) return
+
+    personService
+      .deletePerson(id)
+      .then(res => {
+        setPersons([...persons].filter(x => x.id !== id))
+      })
+  }
+
+  const showNames = persons
+    .filter(person => person.name.toLowerCase().includes(filterValue.toLowerCase()))
+    .map(person => <Person key={ person.name } name={ person.name } number={ person.number } handlePersonDelete={ () => handlePersonDelete(person.id, person.name) } />)
+
   const addPerson = (e) => {
     e.preventDefault()
     const newPerson = { name: newName, number: newNumber }
 
     if (doesPersonAlreadyExist) {
-      return alert(`${newName} is already added to phonebook`)
+      if (!window.confirm(`${ newName } is already added to phonebook, replace the old number with a new one?`)) {
+        resetNameAndNumberFields()
+        return
+      }
+
+      updatePerson()
+      resetNameAndNumberFields()
+      return
     }
 
-    setPersons(persons.concat(newPerson))
-    setNewName('')
-    setNewNumber('')
+    personService
+      .create(newPerson)
+      .then(res => {
+        newPerson.id = res.id
+        setPersons(persons.concat(newPerson))
+      })
+
+    resetNameAndNumberFields()
   } 
+
+  const updatePerson = () => {
+    const personToModify = persons.find(x => x.name.toLowerCase() === newName.toLowerCase())
+    personToModify.number = newNumber
+
+    personService
+      .updatePerson(personToModify)
+      .then(res => console.log(`${ res.name } updated`))
+  }
 
   const doesPersonAlreadyExist = 
     persons.find(person => person.name.toLowerCase() === newName.toLowerCase())

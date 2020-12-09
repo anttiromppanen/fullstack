@@ -1,23 +1,23 @@
 {
-  "persons":[
-    { 
-      "name": "Arto Hellas", 
-      "number": "040-123456",
+  "persons": [
+    {
+      "name": "Juti",
+      "number": "050-123123",
       "id": 1
     },
-    { 
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523",
+    {
+      "name": "Teemu Selänteen",
+      "number": "040-345345",
       "id": 2
     },
-    { 
-      "name": "Dan Abramov", 
-      "number": "12-43-234345",
+    {
+      "name": "Ja",
+      "number": "456456",
       "id": 3
     },
-    { 
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122",
+    {
+      "name": "Teppo Winnipegin",
+      "number": "09-75675",
       "id": 4
     }
   ]
