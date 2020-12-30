@@ -14,7 +14,7 @@ const blogSchema = mongoose.Schema({
 
 const Blog = mongoose.model('Blog', blogSchema);
 
-const mongoUrl = 'mongodb+srv://ana:ana@cluster0.3anup.mongodb.net/blogilista-app?retryWrites=true&w=majority';
+const mongoUrl = process.env.MONGODB_URI;
 mongoose
   .connect(mongoUrl, {
     useNewUrlParser: true,
@@ -42,7 +42,7 @@ app.post('/api/blogs', (request, response) => {
   });
 });
 
-const PORT = 3003;
+const { PORT } = process.env;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
