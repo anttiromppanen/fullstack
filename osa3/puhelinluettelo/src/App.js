@@ -25,14 +25,14 @@ const App = () => {
   const clearNewName = () => setNewName('')
   const clearNewNumber = () => setNewNumber('')
   const makeLowerCase = word => word.toLowerCase()
-  const filterPerson = name => [...persons].filter(x => makeLowerCase(x.name) !== makeLowerCase(name))
-  const setMessageHelper = (msg, trueForSuccessFalseForError) => {
+  const filterPerson = name => persons.filter(x => makeLowerCase(x.name) !== makeLowerCase(name))
+  const setMessageHelper = (msg, trueForSuccessFalseForError, timeInMs) => {
     setMessage(msg)
     setErrorOrSuccess(trueForSuccessFalseForError)
     setTimeout(() => {
       setMessage(null)
       setErrorOrSuccess(null)
-    }, 3000)
+    }, timeInMs)
   }
 
   const handlePersonDelete = (id, name) => {
@@ -40,9 +40,13 @@ const App = () => {
 
     personService
       .deletePerson(id)
-      .then(res => setPersons(filterPerson(name)))
+      .then(res => {
+        personService
+          .getAll()
+          .then(res => setPersons(res))
+      })
       .catch(res => {
-        setMessageHelper(`Information of ${ name } has already been removed from server`, false)
+        setMessageHelper(`Information of ${ name } has already been removed from server`, false, 3000)
         setPersons(filterPerson(name))
       })
   }
@@ -92,6 +96,7 @@ const App = () => {
         .updatePerson(person.id, newPerson)
         .then(res => setPersons(persons.map(x => makeLowerCase(x.name) !== makeLowerCase(newName) ? x : updatedPerson)))
         .then(res => {
+          setMessageHelper(`Updated number for ${ newPerson.name }`, true, 3000)
           clearNewName()
           clearNewNumber()
         })
@@ -103,8 +108,9 @@ const App = () => {
         .create(newPerson)
         .then(res => {
           setPersons(persons.concat(res))
-          setMessageHelper(`Added ${ res.name }`, true)
+          setMessageHelper(`Added ${ res.name }`, true, 3000)
         })
+        .catch(error => setMessageHelper(error.response.data.error, false, 6000))
         .then(() => {
           personService
             .getAll()
