@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
-const pw = process.argv[2];
+// const pw = process.argv[2];
 
-const mongoUrl = `mongodb+srv://ana:${pw}@cluster0.3anup.mongodb.net/blogilista-app?retryWrites=true&w=majority`;
+const mongoUrl = 'censored';
 mongoose.connect(mongoUrl, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
