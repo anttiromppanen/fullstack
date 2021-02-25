@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-param-reassign */
 const mongoose = require('mongoose');
 
 const blogSchema = mongoose.Schema({
@@ -5,6 +7,10 @@ const blogSchema = mongoose.Schema({
   author: String,
   url: String,
   likes: Number,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
 });
 
 blogSchema.set('toJSON', {
