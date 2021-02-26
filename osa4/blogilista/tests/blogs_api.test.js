@@ -1,14 +1,34 @@
+/* eslint-disable no-underscore-dangle */
 const mongoose = require('mongoose');
 const supertest = require('supertest');
+const jwt = require('jsonwebtoken');
 const app = require('../app');
 const helper = require('./test_helper');
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
 const api = supertest(app);
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  await Blog.insertMany(helper.initialBlogs);
+  await User.deleteMany({});
+
+  const user = {
+    username: 'root',
+    name: 'root',
+    password: 'root',
+  };
+
+  const userObject = new User(user);
+  await userObject.save();
+
+  const blogObjects = helper.initialBlogs.map((blog) => {
+    const newBlog = new Blog(blog);
+    newBlog.user = userObject.id;
+    return newBlog;
+  });
+  const promiseArray = blogObjects.map((x) => x.save());
+  await Promise.all(promiseArray);
 });
 
 describe('initial tests', () => {
@@ -18,15 +38,26 @@ describe('initial tests', () => {
   });
 
   test('a valid blog can be added', async () => {
+    const user = await User.findOne({});
+
+    const userForToken = {
+      username: user.username,
+      id: user._id,
+    };
+
+    const token = jwt.sign(userForToken, process.env.SECRET);
+
     const newBlog = {
       title: 'Test Blog from post test',
       author: 'Not Antti',
       url: 'www.antti.fi',
       likes: 100,
+      user: user._id,
     };
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
@@ -46,14 +77,25 @@ describe('Check blog fields', () => {
   });
 
   test('return 0 likes if likes are not set', async () => {
+    const user = await User.findOne({});
+
+    const userForToken = {
+      username: user.username,
+      id: user._id,
+    };
+
+    const token = jwt.sign(userForToken, process.env.SECRET);
+
     const newBlog = {
       title: 'Test post for likes not set',
       author: 'Not Antti',
       url: 'www.antti.fi',
+      user: user._id,
     };
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
@@ -65,32 +107,72 @@ describe('Check blog fields', () => {
   });
 
   test('return 400 if title not set', async () => {
+    const user = await User.findOne({});
+
+    const userForToken = {
+      username: user.username,
+      id: user._id,
+    };
+
+    const token = jwt.sign(userForToken, process.env.SECRET);
+
     const newBlog = {
       author: 'Not Antti',
       url: 'www.antti.fi',
       likes: 500,
+      user: user._id,
     };
 
-    await api.post('/api/blogs').send(newBlog).expect(400);
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
+      .send(newBlog)
+      .expect(400);
   });
 
   test('return 400 if url not set', async () => {
+    const user = await User.findOne({});
+
+    const userForToken = {
+      username: user.username,
+      id: user._id,
+    };
+
+    const token = jwt.sign(userForToken, process.env.SECRET);
+
     const newBlog = {
       title: 'Check if url not set',
       author: 'Not Antti',
       likes: 5,
+      user: user._id,
     };
 
-    await api.post('/api/blogs').send(newBlog).expect(400);
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
+      .send(newBlog)
+      .expect(400);
   });
 });
 
 describe('Deletion of a blog', () => {
   test('returns 204 if id is valid', async () => {
+    const user = await User.findOne({});
+
+    const userForToken = {
+      username: user.username,
+      id: user._id,
+    };
+
+    const token = jwt.sign(userForToken, process.env.SECRET);
+
     const response = await api.get('/api/blogs');
     const { id } = response.body.slice(-1)[0];
 
-    await api.delete(`/api/blogs/${id}`).expect(204);
+    await api
+      .delete(`/api/blogs/${id}`)
+      .set('Authorization', `bearer ${token}`)
+      .expect(204);
   });
 
   test('returns 400 if id is invalid', async () => {
