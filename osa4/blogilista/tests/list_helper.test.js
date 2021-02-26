@@ -81,17 +81,35 @@ describe('total likes', () => {
     const result = listHelper.totalLikes(blogs);
     expect(result).toBe(36);
   });
+});
 
-  describe('blog tests', () => {
-    test('returns blog with most likes correctly', () => {
-      const result = listHelper.favoriteBlog(blogs);
-      const expected = {
-        title: 'Canonical string reduction',
-        author: 'Edsger W. Dijkstra',
-        likes: 12,
-      };
+describe('blog tests', () => {
+  test('returns blog with most likes correctly', () => {
+    const result = listHelper.favoriteBlog(blogs);
+    const expected = {
+      title: 'Canonical string reduction',
+      author: 'Edsger W. Dijkstra',
+      likes: 12,
+    };
 
-      expect(result).toEqual(expected);
-    });
+    expect(result).toEqual(expected);
+  });
+
+  test('returns author with most blogs correctly', () => {
+    const result = listHelper.mostBlogs(blogs);
+    const expectedResult = {
+      author: 'Robert C. Martin',
+      blogs: 3,
+    };
+    expect(result).toEqual(expectedResult);
+  });
+
+  test('returns most likes for single author correctly', () => {
+    const result = listHelper.mostLikes(blogs);
+    const expectedResult = {
+      author: 'Edsger W. Dijkstra',
+      likes: 17,
+    };
+    expect(result).toEqual(expectedResult);
   });
 });
