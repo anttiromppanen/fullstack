@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
+import LoginForm from './components/LoginForm'
+import ShowBlogs from './components/ShowBlogs'
+import ShowUser from './components/ShowUser'
+import NewBlogView from './components/NewBlogView'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -29,8 +32,11 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
-  
-  const resetMessageAndCondition = () => {
+
+  const setAndResetMessage = (msg, trueGreenfalseRed) => {
+    setMessage(msg)
+    setSuccessOrError(trueGreenfalseRed)
+
     setTimeout(() => {
       setMessage(null)
       setSuccessOrError(null)
@@ -49,157 +55,48 @@ const App = () => {
      setUser(user)
      setUsername('')
      setPassword('')
-     setMessage(`succesfully logged in as ${user.name}`)
-     setSuccessOrError(true)
-
-     resetMessageAndCondition()
+     setAndResetMessage(`succesfully logged in as ${user.name}`, true)
     } catch (error) {
-      setMessage('wrong credentials')
-      setSuccessOrError(false)
-
-      resetMessageAndCondition()
-    }
-  }
-
-  const loginForm = () => {
-    return (
-      <div>
-        <h2>login</h2>
-        <form onSubmit={handleLogin}>
-          <div>
-            username 
-              {/* Whitespace */}
-              {'  '}
-              <input 
-                type="text" 
-                value={username}
-                name="Username"
-                onChange={({ target }) => setUsername(target.value)}
-              />
-          </div>
-          <div>
-            password
-              {/* Whitespace */}
-              {' '}
-              <input 
-                type="password"
-                value={password}
-                name="Password"
-                onChange={({ target }) => setPassword(target.value)}
-              />
-          </div>
-          <button type="submit">login</button>
-        </form>
-      </div>
-    )
-  }
-
-  const showBlogs = () => {
-    return (
-      <div>
-        <h2>blogs</h2>
-        { blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
-        )}
-      </div>
-    )
-  }
-
-  const showUser = () => {
-    const handleLogout = () => {
-      window.localStorage.removeItem('loggedBlogappUser')
-      setUser(null)
-      setUsername('')
+      setAndResetMessage('wrong credentials', false)
       setPassword('')
     }
-
-    return (
-      <p>
-        { user.name } logged in
-        {' '}
-        <button onClick={ handleLogout }>logout</button>
-      </p>
-    )
-  }
-
-  const createNewBlogView = () => {
-    const handleSubmit = async (e) => {
-      e.preventDefault()
-
-      const newBlog = {
-        title,
-        author,
-        url
-      }
-
-      if (!newBlog.title || !newBlog.author || !newBlog.url) {
-        setMessage('no empty fields allowed')
-        setSuccessOrError(false)
-        resetMessageAndCondition()
-        return 
-      }
-
-      setAuthor('')
-      setTitle('')
-      setUrl('')
-
-      try {
-        const response = await blogService.create(newBlog)
-        setMessage(`a new blog ${response.title} by ${response.author} added`)
-        setSuccessOrError(true)
-        resetMessageAndCondition()
-        setBlogs(blogs.concat(response))
-      } catch (error) {
-        console.log(error) 
-      }
-    }
-    return (
-      <div>
-        <h2>create new</h2>
-        <form onSubmit={ handleSubmit }>
-          <div>
-            title:
-            <input 
-              type="text"
-              value={title}
-              name="Title"
-              onChange={({ target }) => setTitle(target.value)}
-            />
-          </div>
-          <div>
-            author: 
-            <input
-              type="text"
-              value={author}
-              name="Author"
-              onChange={({ target }) => setAuthor(target.value)}
-            />
-          </div>
-          <div>
-            url:
-            <input
-              type="text"
-              value={url}
-              name="Url"
-              onChange={({ target }) => setUrl(target.value)}
-            />
-          </div>
-          <button type="submit">create</button>
-        </form>
-      </div>
-    )
   }
  
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser')
+
+    setAndResetMessage(`logged out user ${user.name}`, true)
+    setUser(null)
+    setUsername('')
+    setPassword('')
+  }
+
   const siteViewLogic = () => {
     if (user === null) {
-      return loginForm()
+      return <LoginForm 
+        handleLogin={ handleLogin }
+        username={ username }
+        setUsername={ setUsername }
+        password={ password }
+        setPassword={ setPassword }
+      />
     } else {
       return (
         <div>
           <h2>blog app</h2>
-          { showUser() }
-          { createNewBlogView() }
-          { showBlogs() }
+          <ShowUser user={ user } handleLogout={ handleLogout } />
+          <NewBlogView
+            author={ author }
+            blogs={ blogs }
+            setAndResetMessage={ setAndResetMessage }
+            setAuthor={ setAuthor }
+            setBlogs={ setBlogs}
+            setTitle={ setTitle }
+            setUrl={ setUrl }
+            title={ title }
+            url={ url }
+          />
+          <ShowBlogs blogs={ blogs } />
         </div>
       )
     }
