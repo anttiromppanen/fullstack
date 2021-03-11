@@ -1,5 +1,6 @@
 import React from 'react'
 import Blog from './Blog'
+import PropTypes from 'prop-types'
 
 const ShowBlogs = ({ blogs, setBlogs, user, setAndResetMessage }) => {
   const blogsSortedByLikes = blogs.sort((a, b) => b.likes - a.likes)
@@ -12,6 +13,12 @@ const ShowBlogs = ({ blogs, setBlogs, user, setAndResetMessage }) => {
       )}
     </div>
   )
+}
+
+ShowBlogs.propTypes = {
+  setBlogs: PropTypes.func.isRequired,
+  blogs: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired
 }
 
 export default ShowBlogs

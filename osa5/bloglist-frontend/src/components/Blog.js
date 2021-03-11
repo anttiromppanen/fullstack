@@ -1,4 +1,3 @@
-import { getQueriesForElement } from '@testing-library/dom'
 import React, { useState } from 'react'
 import blogService from '../services/blogs'
 
@@ -20,13 +19,13 @@ const Blog = ({ blog, blogs, setBlogs, user, setAndResetMessage }) => {
   const removeButtonStyle = {
     display: blog.user.username === user.username ? '' : 'none',
     background: 'red',
-    border: 0,
+    border: '1px solid black',
     color: 'white'
   }
 
   const likeButtonStyle = {
     background: 'green',
-    border: 0,
+    border: '1px solid black',
     color: 'white'
   }
 
