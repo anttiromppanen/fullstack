@@ -36,8 +36,9 @@
   },
   "proxy": "http://localhost:3001",
   "devDependencies": {
-    "eslint-auto-fix": "^1.0.3",
     "eslint-config-airbnb": "^18.2.1",
-    "eslint-plugin-jest": "^24.2.1"
+    "eslint-plugin-jest": "^24.2.1",
+    "prettier": "^2.2.1",
+    "prettier-eslint": "^12.0.0"
   }
 }

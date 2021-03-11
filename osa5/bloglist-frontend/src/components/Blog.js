@@ -15,7 +15,7 @@ const Blog = ({ blog, blogs, setBlogs, user, setAndResetMessage }) => {
     color: visible ? 'red' : 'green',
     border: '2px solid lightgrey'
   }
-  
+
   const removeButtonStyle = {
     display: blog.user.username === user.username ? '' : 'none',
     background: 'red',
@@ -42,7 +42,7 @@ const Blog = ({ blog, blogs, setBlogs, user, setAndResetMessage }) => {
       likes: blog.likes + 1,
       user: blog.user
     }
-    
+
     try {
       const response = await blogService.update(newObject)
       // response.user comes as id, dunno why so need to do it this way
@@ -50,10 +50,10 @@ const Blog = ({ blog, blogs, setBlogs, user, setAndResetMessage }) => {
       blogToReplace.likes = response.likes
       setBlogs(blogs.map(x => x.id !== blogToReplace.id ? x : blogToReplace))
     } catch (error) {
-      console.log(error.message) 
+      console.log(error.message)
     }
   }
- 
+
   const deleteBlog = async () => {
     if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       return
@@ -65,7 +65,7 @@ const Blog = ({ blog, blogs, setBlogs, user, setAndResetMessage }) => {
       setAndResetMessage(`removed blog ${blog.title} by ${blog.author}`, true)
       return response
     } catch (error) {
-      console.log(error.message) 
+      console.log(error.message)
     }
   }
 

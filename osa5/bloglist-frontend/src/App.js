@@ -21,7 +21,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -45,24 +45,24 @@ const App = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault()
-    
+
     try {
-     const user = await loginService.login({ username, password }) 
-     window.localStorage.setItem(
-       'loggedBlogappUser', JSON.stringify(user)
-     )
-     blogService.setToken(user.token)
-     setUser(user)
-     setUsername('')
-     setPassword('')
-     setAndResetMessage(`succesfully logged in as ${user.name}`, true)
+      const user = await loginService.login({ username, password })
+      window.localStorage.setItem(
+        'loggedBlogappUser', JSON.stringify(user)
+      )
+      blogService.setToken(user.token)
+      setUser(user)
+      setUsername('')
+      setPassword('')
+      setAndResetMessage(`succesfully logged in as ${user.name}`, true)
     } catch (error) {
       setAndResetMessage('wrong credentials', false)
       setPassword('')
     }
   }
- 
-  const createBlog = async ({title, author, url}) => {
+
+  const createBlog = async ({ title, author, url }) => {
     const newBlog = {
       title,
       author,
@@ -71,17 +71,17 @@ const App = () => {
 
     if (!newBlog.title || !newBlog.author || !newBlog.url) {
       setAndResetMessage('no empty fields allowed', false)
-      return 
+      return
     }
 
 
     try {
       blogFormRef.current.toggleVisibility()
       const response = await blogService.create(newBlog)
-      setAndResetMessage(`a new blog ${response.title} by ${response.author} added`, true) 
+      setAndResetMessage(`a new blog ${response.title} by ${response.author} added`, true)
       setBlogs(blogs.concat(response))
     } catch (error) {
-      console.log(error) 
+      console.log(error)
     }
   }
 
@@ -106,7 +106,7 @@ const App = () => {
 
   const siteViewLogic = () => {
     if (user === null) {
-      return <LoginForm 
+      return <LoginForm
         handleLogin={ handleLogin }
         username={ username }
         setUsername={ setUsername }
@@ -123,7 +123,7 @@ const App = () => {
         </div>
       )
     }
-  }  
+  }
 
   return (
     <div>
