@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
@@ -6,6 +6,7 @@ import LoginForm from './components/LoginForm'
 import ShowBlogs from './components/ShowBlogs'
 import ShowUser from './components/ShowUser'
 import NewBlogView from './components/NewBlogView'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -14,9 +15,8 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -62,6 +62,29 @@ const App = () => {
     }
   }
  
+  const createBlog = async ({title, author, url}) => {
+    const newBlog = {
+      title,
+      author,
+      url
+    }
+
+    if (!newBlog.title || !newBlog.author || !newBlog.url) {
+      setAndResetMessage('no empty fields allowed', false)
+      return 
+    }
+
+
+    try {
+      blogFormRef.current.toggleVisibility()
+      const response = await blogService.create(newBlog)
+      setAndResetMessage(`a new blog ${response.title} by ${response.author} added`, true) 
+      setBlogs(blogs.concat(response))
+    } catch (error) {
+      console.log(error) 
+    }
+  }
+
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
 
@@ -69,6 +92,16 @@ const App = () => {
     setUser(null)
     setUsername('')
     setPassword('')
+  }
+
+  const blogForm = () => {
+    return (
+      <Togglable buttonLabel="new blog" ref={blogFormRef}>
+        <NewBlogView
+          createBlog={ createBlog }
+        />
+      </Togglable>
+    )
   }
 
   const siteViewLogic = () => {
@@ -85,18 +118,8 @@ const App = () => {
         <div>
           <h2>blog app</h2>
           <ShowUser user={ user } handleLogout={ handleLogout } />
-          <NewBlogView
-            author={ author }
-            blogs={ blogs }
-            setAndResetMessage={ setAndResetMessage }
-            setAuthor={ setAuthor }
-            setBlogs={ setBlogs}
-            setTitle={ setTitle }
-            setUrl={ setUrl }
-            title={ title }
-            url={ url }
-          />
-          <ShowBlogs blogs={ blogs } />
+          { blogForm() }
+          <ShowBlogs blogs={ blogs } setBlogs={ setBlogs } user={user} setAndResetMessage={ setAndResetMessage } />
         </div>
       )
     }

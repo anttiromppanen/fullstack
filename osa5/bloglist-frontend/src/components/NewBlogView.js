@@ -1,37 +1,27 @@
-import React from 'react'
-import blogService from '../services/blogs'
+import React, { useState } from 'react'
 
-const NewBlogView = ({ title, author, url, setAndResetMessage, setAuthor, setTitle, setUrl, setBlogs, blogs }) => {
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+const NewBlogView = ({ createBlog }) => {
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
 
-    const newBlog = {
+  const addBlog = (event) => {
+    event.preventDefault()
+    createBlog({
       title,
       author,
       url
-    }
+    })
 
-    if (!newBlog.title || !newBlog.author || !newBlog.url) {
-      setAndResetMessage('no empty fields allowed', false)
-      return 
-    }
-
-    setAuthor('')
     setTitle('')
+    setAuthor('')
     setUrl('')
-
-    try {
-      const response = await blogService.create(newBlog)
-      setAndResetMessage(`a new blog ${response.title} by ${response.author} added`, true) 
-      setBlogs(blogs.concat(response))
-    } catch (error) {
-      console.log(error) 
-    }
   }
+
   return (
     <div>
       <h2>create new</h2>
-      <form onSubmit={ handleSubmit }>
+      <form onSubmit={ addBlog }>
         <div>
           title:
           <input 
