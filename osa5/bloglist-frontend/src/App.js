@@ -94,6 +94,27 @@ const App = () => {
     setPassword('')
   }
 
+  const addVote = async (blog) => {
+    const newObject = {
+      id: blog.id,
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blog.likes + 1,
+      user: blog.user
+    }
+
+    try {
+      const response = await blogService.update(newObject)
+      // response.user comes as id, dunno why so need to do it this way
+      const blogToReplace = blogs.find(x => x.id === response.id)
+      blogToReplace.likes = response.likes
+      setBlogs(blogs.map(x => x.id !== blogToReplace.id ? x : blogToReplace))
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
+
   const blogForm = () => {
     return (
       <Togglable buttonLabel="new blog" ref={blogFormRef}>
@@ -119,7 +140,7 @@ const App = () => {
           <h2>blog app</h2>
           <ShowUser user={ user } handleLogout={ handleLogout } />
           { blogForm() }
-          <ShowBlogs blogs={ blogs } setBlogs={ setBlogs } user={user} setAndResetMessage={ setAndResetMessage } />
+          <ShowBlogs blogs={ blogs } setBlogs={ setBlogs } user={user} setAndResetMessage={ setAndResetMessage } addVote={addVote} />
         </div>
       )
     }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog, blogs, setBlogs, user, setAndResetMessage }) => {
+const Blog = ({ blog, blogs, setBlogs, user, setAndResetMessage, addVote }) => {
   const [visible, setVisible] = useState(false)
 
   const blogStyle = {
@@ -33,27 +33,6 @@ const Blog = ({ blog, blogs, setBlogs, user, setAndResetMessage }) => {
   const buttonText = visible ? 'hide' : 'view'
   const toggleVisibility = () => setVisible(!visible)
 
-  const updateVotes = async (blog) => {
-    const newObject = {
-      id: blog.id,
-      title: blog.title,
-      author: blog.author,
-      url: blog.url,
-      likes: blog.likes + 1,
-      user: blog.user
-    }
-
-    try {
-      const response = await blogService.update(newObject)
-      // response.user comes as id, dunno why so need to do it this way
-      const blogToReplace = blogs.find(x => x.id === response.id)
-      blogToReplace.likes = response.likes
-      setBlogs(blogs.map(x => x.id !== blogToReplace.id ? x : blogToReplace))
-    } catch (error) {
-      console.log(error.message)
-    }
-  }
-
   const deleteBlog = async () => {
     if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
       return
@@ -70,11 +49,11 @@ const Blog = ({ blog, blogs, setBlogs, user, setAndResetMessage }) => {
   }
 
   return (
-    <div style={blogStyle}>
-      {blog.title} {blog.author} <button style={buttonStyle} onClick={toggleVisibility}>{buttonText}</button>
-      <div style={showWhenVisible}>
+    <div style={blogStyle} className='blog'>
+      {blog.title} {blog.author} <button style={buttonStyle} onClick={toggleVisibility} className="toggleInformation">{buttonText}</button>
+      <div style={showWhenVisible} className="togglableContent">
         <p>{blog.url}</p>
-        <p>{blog.likes} <button style={likeButtonStyle} onClick={() => updateVotes(blog)}>like</button></p>
+        <p>{blog.likes} <button style={likeButtonStyle} onClick={() => addVote(blog)}>like</button></p>
         <p>{blog.user.name}</p>
         <button style={removeButtonStyle} onClick={() => deleteBlog()}>remove</button>
       </div>
