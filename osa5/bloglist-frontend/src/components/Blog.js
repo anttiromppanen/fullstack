@@ -53,7 +53,10 @@ const Blog = ({ blog, blogs, setBlogs, user, setAndResetMessage, addVote }) => {
       {blog.title} {blog.author} <button style={buttonStyle} onClick={toggleVisibility} className="toggleInformation">{buttonText}</button>
       <div style={showWhenVisible} className="togglableContent">
         <p>{blog.url}</p>
-        <p>{blog.likes} <button style={likeButtonStyle} onClick={() => addVote(blog)}>like</button></p>
+        <p>
+          <span id="likeCount" style={{ marginRight: '5px' }}>{blog.likes}</span>
+          <button style={likeButtonStyle} onClick={() => addVote(blog)}>like</button>
+        </p>
         <p>{blog.user.name}</p>
         <button style={removeButtonStyle} onClick={() => deleteBlog()}>remove</button>
       </div>

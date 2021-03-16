@@ -20,7 +20,7 @@ const Notification = ({ message, successOrError }) => {
   if (message === null) return null
 
   return (
-    <h1 style={ setStyle }>
+    <h1 className="notification" style={ setStyle }>
       { message }
     </h1>
   )

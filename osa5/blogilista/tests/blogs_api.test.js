@@ -9,22 +9,32 @@ const User = require('../models/user');
 
 const api = supertest(app);
 
-beforeEach(async () => {
-  await Blog.deleteMany({});
+beforeAll(async () => {
   await User.deleteMany({});
-
-  const user = {
-    username: 'root',
-    name: 'root',
-    password: 'root',
-  };
-
+  const user = helper.initialUsers[0];
   const userObject = new User(user);
   await userObject.save();
+});
+
+beforeEach(async () => {
+  await Blog.deleteMany({});
+  // await User.deleteMany({});
+
+  // const user = {
+  //  username: 'root',
+  //  name: 'root',
+  //  password: 'root',
+  // };
+
+  const user = await User.findOne({});
+  console.log(user);
+
+  // const userObject = new User(user);
+  // await userObject.save();
 
   const blogObjects = helper.initialBlogs.map((blog) => {
     const newBlog = new Blog(blog);
-    newBlog.user = userObject.id;
+    newBlog.user = user.id;
     return newBlog;
   });
   const promiseArray = blogObjects.map((x) => x.save());
