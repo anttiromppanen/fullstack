@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const blogsRouter = require('express').Router();
 const jwt = require('jsonwebtoken');
 const Blog = require('../models/blog');
@@ -30,8 +31,9 @@ blogsRouter.post('/', async (request, response) => {
   const savedBlog = await blog.save();
   user.blogs = user.blogs.concat(savedBlog._id);
   await user.save();
+  const blogToReturn = await Blog.findById(blog.id).populate('user', { username: 1, name: 1, id: 1 });
 
-  return response.status(201).json(savedBlog);
+  return response.status(201).json(blogToReturn);
 });
 
 blogsRouter.delete('/:id', async (request, response) => {
