@@ -10,10 +10,12 @@ const reducer = (state = null, action) => {
   }
 }
 
+let timer
 export const setNotification = (message, time) => {
   return async dispatch => {
     dispatch(createNotification(message))
-    setTimeout(() => {
+    clearTimeout(timer)
+    timer = setTimeout(() => {
       dispatch(clearNotification())
     }, time * 1000)
   }
