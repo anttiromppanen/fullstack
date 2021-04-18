@@ -3,6 +3,7 @@ import {
   Switch, Route, Link, useRouteMatch, useHistory
 } from 'react-router-dom'
 import React, { useState } from 'react'
+import { useField } from './hooks'
 
 const Menu = () => {
   const padding = {
@@ -61,22 +62,29 @@ const Footer = () => (
   </div>
 )
 
-const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+const CreateNew = ({ addNew, content, author, url }) => {
   const history = useHistory()
+  const removeReset = ({ reset, ...rest }) => rest
+  const contentWithoutReset = removeReset(content)
+  const authorWithoutReset = removeReset(author)
+  const urlWithoutReset = removeReset(url)
 
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    props.addNew({
-      content,
-      author,
-      info,
+    addNew({
+      content: content.value,
+      author: author.value,
+      info: url.value,
       votes: 0
     })
     history.push('/')
+  }
+
+  const handleReset = () => {
+    content.reset()
+    author.reset()
+    url.reset()
   }
 
   return (
@@ -85,17 +93,18 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input {...contentWithoutReset} />
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input {...authorWithoutReset} />
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
+          <input {...urlWithoutReset} />
         </div>
         <button>create</button>
+        <button type="reset" onClick={() => handleReset()}>reset</button>
       </form>
     </div>
   )
@@ -119,6 +128,10 @@ const App = () => {
       id: '2'
     }
   ])
+
+  const content = useField('text')
+  const author = useField('text')
+  const url = useField('text')
 
   const [notification, setNotification] = useState('')
   const setAndClearNotification = (msg) => {
@@ -166,7 +179,12 @@ const App = () => {
           <Anecdote anecdote={anecdote} /> 
         </Route>
         <Route path="/create">
-          <CreateNew  addNew={addNew} />
+          <CreateNew  
+            addNew={addNew}
+            content={content}
+            author={author}
+            url={url}
+          />
         </Route>
         <Route path="/about">
           <About />
