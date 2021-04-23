@@ -17,26 +17,28 @@ const useField = (type) => {
 
 const useCountry = (name) => {
   const [country, setCountry] = useState(null)
+  const [found, setFound] = useState(false)
 
   useEffect(() => {
-    if (name.length > 0) {
       axios
         .get(`https://restcountries.eu/rest/v2/name/${name}?fullText=true`)
-        .then((res) => setCountry(res.data[0]))
-        .catch((err) => console.log(err.message))
-    }
+        .then((res) => {
+          setCountry(res.data[0])
+          setFound(true)
+        })
+        .catch((error) => {
+          setCountry('placeholder')
+          setFound(null)
+          console.log(error.message)
+        })
   }, [name])
+ 
+  if (!country) {
+    return false
+  }  
 
-  const found = () => country ? true : false
-
-  if (!country && !found()) {
-    return null
-  }
-
-  if (!found()) {
-    return {
-      country: true
-    }
+  if (!found) {
+    return country
   }
 
   return {
@@ -46,7 +48,6 @@ const useCountry = (name) => {
 }
 
 const Country = ({ country }) => {
-  console.log('test')
   if (!country) {
     return null
   }
@@ -58,7 +59,7 @@ const Country = ({ country }) => {
       </div>
     )
   }
-  
+
   return (
     <div>
       <h3>{country.data.name} </h3>
@@ -73,7 +74,7 @@ const App = () => {
   const nameInput = useField('text')
   const [name, setName] = useState('')
   const country = useCountry(name)
-  
+
   const fetch = (e) => {
     e.preventDefault()
     setName(nameInput.value)
