@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 import { useLazyQuery } from '@apollo/client'
 import { ALL_BOOKS } from '../queries'
 
@@ -37,7 +38,6 @@ const Recommendations = ({ show, books }) => {
     return null
   }
 
-  console.log(result)
   return (
     <div> 
       <h2>recommendations</h2>
@@ -52,7 +52,7 @@ const Recommendations = ({ show, books }) => {
         </thead>
         <tbody>
             {result.data.allBooks.map(x => 
-              <tr key={x.id}>
+              <tr key={uuidv4()}>
                 <td>{x.title}</td>
                 <td>{x.name}</td>
                 <td>{x.published}</td>
