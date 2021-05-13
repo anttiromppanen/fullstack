@@ -57,7 +57,7 @@ const typeDefs = gql`
       published: Int!
       genres: [String!]!
       name: String!
-      born: Int!
+      born: Int
     ): Book
 
     editAuthor(
