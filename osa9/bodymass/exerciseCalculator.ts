@@ -8,6 +8,19 @@ interface ExerciseValues {
   average: number;
 }
 
+const parseArguments1 = (args: Array<string>): Array<number> => {
+  args = args.slice(2);
+  
+  const inputs = args.map(x => {
+    const value = Number(x);
+    if (isNaN(value)) throw new Error('Only number values allowed');
+
+    return value
+  });
+
+  return inputs;
+}
+console.log(parseArguments1(process.argv))
 const calculateRating = (averageTrainingTime: number, dailyTargetHours: number): number => {
   if (averageTrainingTime >= dailyTargetHours) return 3;
   if (averageTrainingTime >= dailyTargetHours / 2) return 2;
@@ -46,4 +59,4 @@ const calculateExercises = (hours: Array<number>) => {
 }
 
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1]));
+console.log(calculateExercises(parseArguments1(process.argv)));
