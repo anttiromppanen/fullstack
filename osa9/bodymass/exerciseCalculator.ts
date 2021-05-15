@@ -8,9 +8,15 @@ interface ExerciseValues {
   average: number;
 }
 
-const parseArguments1 = (args: Array<string>): Array<number> => {
+interface InputValues {
+  targetTime: number;
+  inputs: Array<number>;
+}
+
+const parseArguments1 = (args: Array<string>): InputValues => {
   args = args.slice(2);
-  
+  const targetTime = Number(args.shift())
+
   const inputs = args.map(x => {
     const value = Number(x);
     if (isNaN(value)) throw new Error('Only number values allowed');
@@ -18,9 +24,12 @@ const parseArguments1 = (args: Array<string>): Array<number> => {
     return value
   });
 
-  return inputs;
+  return {
+    targetTime,
+    inputs
+  };
 }
-console.log(parseArguments1(process.argv))
+
 const calculateRating = (averageTrainingTime: number, dailyTargetHours: number): number => {
   if (averageTrainingTime >= dailyTargetHours) return 3;
   if (averageTrainingTime >= dailyTargetHours / 2) return 2;
@@ -35,13 +44,13 @@ const textRating = (rating: number): String => {
   return 'bad';
 }
 
-const calculateExercises = (hours: Array<number>) => {
-  const dailyTargetHours = 1;
-  const numOfDays = hours.length;
-  const numOfTrainingDays = hours.filter(x => x > 0).length;
-  const averageTrainingTime = hours.reduce((a,b) => a + b, 0) / numOfDays;
+const calculateExercises = (hours: InputValues) => {
+  const dailyTargetHours = hours.targetTime;
+  const numOfDays = hours.inputs.length;
+  const numOfTrainingDays = hours.inputs.filter(x => x > 0).length;
+  const averageTrainingTime = hours.inputs.reduce((a,b) => a + b, 0) / numOfDays;
   const targetSuccess = 
-    hours.filter(x => x === 0).length > 0
+    hours.inputs.filter(x => x === 0).length > 0
       ? false
       : true
   const rating = calculateRating(averageTrainingTime, dailyTargetHours);
