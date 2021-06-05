@@ -10,6 +10,13 @@ router.get('/', (_req, res) => {
   res.send(patientsService.nonSensitivePatients());
 });
 
+router.get('/:id', (_req, res) => {
+  const patient = patientsService.publicPatients()
+    .find(x => x.id === _req.params.id);
+  
+  res.send(patient);
+});
+
 router.post('/', (_req, res) => {
   try {
     const { name, ssn, dateOfBirth, occupation, gender } = _req.body;
