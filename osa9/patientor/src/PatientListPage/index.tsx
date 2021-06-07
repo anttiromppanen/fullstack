@@ -22,7 +22,7 @@ const PatientListPage = () => {
     setModalOpen(false);
     setError(undefined);
   };
-
+  
   const submitNewPatient = async (values: PatientFormValues) => {
     try {
       const { data: newPatient } = await axios.post<Patient>(

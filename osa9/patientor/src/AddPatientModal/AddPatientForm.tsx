@@ -30,7 +30,8 @@ export const AddPatientForm = ({ onSubmit, onCancel } : Props ) => {
         ssn: "",
         dateOfBirth: "",
         occupation: "",
-        gender: Gender.Other
+        gender: Gender.Other,
+        entries: []
       }}
       onSubmit={onSubmit}
       validate={values => {
